@@ -8,7 +8,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Initialize .NET solution and git repository
 - [x] Set up project structure (Simple monolithic architecture; all logic in API project, organized by folders)
 - [x] Configure database connection (MongoDB or PostgreSQL)
-- [ ] Add README with prerequisites and launch steps
+- [x] Add README with prerequisites and launch steps
 - [ ] Create and maintain a single Docker Compose file at the project root to orchestrate all services (API, database, etc.)
 
 ## 2. Product Management
