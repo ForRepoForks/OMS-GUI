@@ -33,7 +33,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Write tests for Get/List Orders API endpoint
 - [x] Implement Get/List Orders API endpoint
 - [x] Write tests for order endpoint input validation
-- [ ] Input validation for order endpoints
+- [x] Input validation for order endpoints
 
 ## 4. Invoices
 - [ ] Write tests for Order Invoice endpoint (show product name, quantity, discount %, amount, total)
