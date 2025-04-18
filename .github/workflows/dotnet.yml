@@ -11,9 +11,21 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: omsdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -25,4 +37,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
       run: dotnet test --no-build --verbosity normal
