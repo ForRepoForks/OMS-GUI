@@ -7,26 +7,36 @@ namespace OrderManagementSystem.API.Models
 {
     public class Order
     {
-        public class OrderItem
-        {
-            public Product Product { get; set; }
-            public int Quantity { get; set; }
+        public int Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-            public OrderItem(Product product, int quantity)
-            {
-                Product = product ?? throw new ArgumentNullException(nameof(product));
-                Quantity = quantity;
-            }
-        }
+        // Navigation property
+        public List<OrderItem> Items { get; set; } = new();
 
-        public IReadOnlyList<OrderItem> Items { get; }
+        public Order() { }
 
         public Order(IEnumerable<(Product product, int quantity)> items)
         {
             if (items == null || !items.Any())
                 throw new ArgumentException("Order must have at least one product.", nameof(items));
+            Items = items.Select(i => new OrderItem { Product = i.product, Quantity = i.quantity }).ToList();
+        }
+    }
 
-            Items = items.Select(i => new OrderItem(i.product, i.quantity)).ToList().AsReadOnly();
+    public class OrderItem
+    {
+        public int Id { get; set; }
+        public int OrderId { get; set; }
+        public Order Order { get; set; } = null!;
+        public int ProductId { get; set; }
+        public Product Product { get; set; } = null!;
+        public int Quantity { get; set; }
+
+        public OrderItem() { }
+        public OrderItem(Product product, int quantity)
+        {
+            Product = product ?? throw new ArgumentNullException(nameof(product));
+            Quantity = quantity;
         }
     }
 }
