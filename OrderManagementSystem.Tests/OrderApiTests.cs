@@ -79,6 +79,68 @@ namespace OrderManagementSystem.Tests
         }
 
         [Fact]
+        public async Task CreateOrder_EmptyItemsList_ReturnsBadRequest()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var orderRequest = new { items = new object[] { } };
+            var response = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateOrder_MissingProductId_ReturnsBadRequest()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var orderRequest = new { items = new[] { new { quantity = 2 } } };
+            var response = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateOrder_MissingQuantity_ReturnsBadRequest()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            // First, create a valid product
+            var productResp = await client.PostAsJsonAsync("/api/products", new Product { Name = "Test Product", Price = 1.00m });
+            Assert.Equal(HttpStatusCode.Created, productResp.StatusCode);
+            var product = await productResp.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(product);
+            var orderRequest = new { items = new[] { new { productId = product.Id } } };
+            var response = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task CreateOrder_QuantityLessThanOne_ReturnsBadRequest(int quantity)
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            // First, create a valid product
+            var productResp = await client.PostAsJsonAsync("/api/products", new Product { Name = "Test Product", Price = 1.00m });
+            Assert.Equal(HttpStatusCode.Created, productResp.StatusCode);
+            var product = await productResp.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(product);
+            var orderRequest = new { items = new[] { new { productId = product.Id, quantity } } };
+            var response = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task CreateOrder_MissingAllFieldsInItem_ReturnsBadRequest()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var orderRequest = new { items = new[] { new { } } };
+            var response = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
         public async Task CreateOrder_NonExistentProduct_ReturnsNotFound()
         {
             await CleanupDatabaseAsync();
