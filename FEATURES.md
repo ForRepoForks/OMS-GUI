@@ -20,7 +20,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Implement Get/List Products API endpoint
 - [x] Write tests for Product search by name
 - [x] Implement Product search by name
-- [ ] Write tests for Apply Discount to Product (percentage & quantity threshold)
+- [x] Write tests for Apply Discount to Product (percentage & quantity threshold)
 - [ ] Implement Apply Discount to Product (percentage & quantity threshold)
 - [ ] Write tests for product endpoint input validation
 - [ ] Input validation for product endpoints

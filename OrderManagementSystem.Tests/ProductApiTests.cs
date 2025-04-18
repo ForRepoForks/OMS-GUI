@@ -85,5 +85,30 @@ namespace OrderManagementSystem.Tests
             Assert.Contains(products, p => p.Name == "Pineapple");
             Assert.DoesNotContain(products, p => p.Name == "Banana");
         }
+
+        [Fact]
+        public async Task ApplyDiscountToProduct_StoresDiscountCorrectly()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "Discounted Product", Price = 100m };
+            var createResponse = await client.PostAsJsonAsync("/api/products", newProduct);
+            createResponse.EnsureSuccessStatusCode();
+            var created = await createResponse.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(created);
+
+            var discount = new { Percentage = 15, QuantityThreshold = 10 };
+
+            // Act
+            var discountResponse = await client.PutAsJsonAsync($"/api/products/{created.Id}/discount", discount);
+            discountResponse.EnsureSuccessStatusCode();
+            var updated = await discountResponse.Content.ReadFromJsonAsync<Product>();
+
+            // Assert
+            Assert.NotNull(updated);
+            Assert.Equal(created.Id, updated.Id);
+            Assert.Equal(discount.Percentage, updated.DiscountPercentage);
+            Assert.Equal(discount.QuantityThreshold, updated.DiscountQuantityThreshold);
+        }
     }
 }
