@@ -1,6 +1,30 @@
-@OrderManagementSystem.API_HostAddress = http://localhost:5121
+@OrderManagementSystem.API_HostAddress = http://localhost:8080
 
-GET {{OrderManagementSystem.API_HostAddress}}/weatherforecast/
+### Get all products
+GET {{OrderManagementSystem.API_HostAddress}}/api/products
 Accept: application/json
 
-###
+### Search products by name
+GET {{OrderManagementSystem.API_HostAddress}}/api/products?name=Apple
+Accept: application/json
+
+### Create a new product
+POST {{OrderManagementSystem.API_HostAddress}}/api/products
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Product",
+  "price": 19.99
+}
+
+### Apply discount to a product
+PUT {{OrderManagementSystem.API_HostAddress}}/api/products/1/discount
+Content-Type: application/json
+Accept: application/json
+
+{
+  "percentage": 10,
+  "quantityThreshold": 5
+}
+
