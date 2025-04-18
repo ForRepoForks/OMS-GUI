@@ -38,10 +38,22 @@ jobs:
       run: dotnet build --no-restore
     - name: Install EF Core CLI
       run: dotnet tool install --global dotnet-ef
+    - name: Add .NET tools to PATH
+      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
     - name: Apply Migrations
       env:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
       run: dotnet ef database update --project OrderManagementSystem.API/OrderManagementSystem.API.csproj
+    - name: Start API server
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
+      run: |
+        dotnet run --project OrderManagementSystem.API/OrderManagementSystem.API.csproj &
+        for i in {1..10}; do
+          nc -z localhost 5000 && echo "API is up!" && break
+          echo "Waiting for API to start..."
+          sleep 2
+        done
     - name: Test
       env:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
