@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OrderManagementSystem.API.Data;
 using OrderManagementSystem.API.Models;
 
@@ -21,6 +22,13 @@ namespace OrderManagementSystem.API.Controllers
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(CreateProduct), new { id = product.Id }, product);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        {
+            var products = await _context.Products.ToListAsync();
+            return Ok(products);
         }
     }
 }
