@@ -1,10 +1,15 @@
 namespace OrderManagementSystem.API.Models
 {
-    public class Product
+    using System.ComponentModel.DataAnnotations;
+
+public class Product
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public decimal Price { get; set; }
+        [Required]
+[MinLength(1)]
+public string Name { get; set; } = string.Empty;
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
+public decimal Price { get; set; }
         public decimal? DiscountPercentage { get; set; }
         public int? DiscountQuantityThreshold { get; set; }
     }

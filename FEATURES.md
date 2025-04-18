@@ -23,7 +23,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Write tests for Apply Discount to Product (percentage & quantity threshold)
 - [x] Implement Apply Discount to Product (percentage & quantity threshold)
 - [x] Write tests for product endpoint input validation
-- [ ] Input validation for product endpoints
+- [x] Input validation for product endpoints
 
 ## 3. Order Management
 - [ ] Write tests for Order entity/model (with product list and quantities)

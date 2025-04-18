@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderManagementSystem.API.Data;
 using OrderManagementSystem.API.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace OrderManagementSystem.API.Controllers
 {
@@ -19,6 +20,10 @@ namespace OrderManagementSystem.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(product.Name))
+            {
+                return BadRequest(ModelState);
+            }
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(CreateProduct), new { id = product.Id }, product);
@@ -39,6 +44,10 @@ namespace OrderManagementSystem.API.Controllers
         [HttpPut("{id}/discount")]
         public async Task<ActionResult<Product>> ApplyDiscount(int id, [FromBody] DiscountDto discount)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var product = await _context.Products.FindAsync(id);
             if (product == null)
                 return NotFound();
@@ -51,7 +60,9 @@ namespace OrderManagementSystem.API.Controllers
 
         public class DiscountDto
         {
+            [Range(0, 100, ErrorMessage = "Discount percentage must be between 0 and 100.")]
             public decimal Percentage { get; set; }
+            [Range(1, int.MaxValue, ErrorMessage = "Quantity threshold must be greater than 0.")]
             public int QuantityThreshold { get; set; }
         }
     }
