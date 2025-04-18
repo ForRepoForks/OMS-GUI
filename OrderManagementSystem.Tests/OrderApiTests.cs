@@ -83,5 +83,50 @@ namespace OrderManagementSystem.Tests
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
+
+        [Fact]
+        public async Task GetOrders_Empty_ReturnsEmptyList()
+        {
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/api/orders");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var orders = await response.Content.ReadFromJsonAsync<List<OrderResponse>>();
+            Assert.NotNull(orders);
+            Assert.Empty(orders);
+        }
+
+        [Fact]
+        public async Task GetOrders_ReturnsCreatedOrdersWithItems()
+        {
+            var client = _factory.CreateClient();
+            // Create products
+            var p1 = new Product { Name = "GetList Product 1", Price = 1.00m };
+            var p2 = new Product { Name = "GetList Product 2", Price = 2.00m };
+            var resp1 = await client.PostAsJsonAsync("/api/products", p1);
+            var resp2 = await client.PostAsJsonAsync("/api/products", p2);
+            var prod1 = await resp1.Content.ReadFromJsonAsync<Product>();
+            var prod2 = await resp2.Content.ReadFromJsonAsync<Product>();
+
+            // Create order 1
+            var orderReq1 = new { items = new[] { new { productId = prod1.Id, quantity = 2 } } };
+            var respOrder1 = await client.PostAsJsonAsync("/api/orders", orderReq1);
+            respOrder1.EnsureSuccessStatusCode();
+            var created1 = await respOrder1.Content.ReadFromJsonAsync<OrderResponse>();
+
+            // Create order 2
+            var orderReq2 = new { items = new[] { new { productId = prod2.Id, quantity = 3 } } };
+            var respOrder2 = await client.PostAsJsonAsync("/api/orders", orderReq2);
+            respOrder2.EnsureSuccessStatusCode();
+            var created2 = await respOrder2.Content.ReadFromJsonAsync<OrderResponse>();
+
+            // Act
+            var response = await client.GetAsync("/api/orders");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var orders = await response.Content.ReadFromJsonAsync<List<OrderResponse>>();
+            Assert.NotNull(orders);
+            Assert.True(orders.Count >= 2); // There may be leftover orders from other tests
+            Assert.Contains(orders, o => o.Id == created1.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod1.Id && o.Items[0].Quantity == 2);
+            Assert.Contains(orders, o => o.Id == created2.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod2.Id && o.Items[0].Quantity == 3);
+        }
     }
 }
