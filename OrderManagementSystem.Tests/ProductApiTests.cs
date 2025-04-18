@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using OrderManagementSystem.API.Models;
 using Xunit;
 
@@ -9,6 +10,16 @@ namespace OrderManagementSystem.Tests
 {
     public class ProductApiTests : IClassFixture<WebApplicationFactory<OrderManagementSystem.API.Program>>
     {
+        private async Task CleanupDatabaseAsync()
+        {
+            using var scope = _factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<OrderManagementSystem.API.Data.OrderManagementContext>();
+            db.OrderItems.RemoveRange(db.OrderItems);
+            db.Orders.RemoveRange(db.Orders);
+            db.Products.RemoveRange(db.Products);
+            await db.SaveChangesAsync();
+        }
+
         [Theory]
         [InlineData(null, 10)]
         [InlineData("", 10)]
@@ -16,6 +27,7 @@ namespace OrderManagementSystem.Tests
         [InlineData("Valid Name", -5)]
         public async Task CreateProduct_InvalidInput_ReturnsBadRequest(string name, decimal price)
         {
+            await CleanupDatabaseAsync();
             var client = _factory.CreateClient();
             var product = new Product { Name = name, Price = price };
             var response = await client.PostAsJsonAsync("/api/products", product);
@@ -29,6 +41,7 @@ namespace OrderManagementSystem.Tests
         [InlineData(10, -5)]
         public async Task ApplyDiscount_InvalidInput_ReturnsBadRequest(decimal percentage, int quantityThreshold)
         {
+            await CleanupDatabaseAsync();
             var client = _factory.CreateClient();
             var newProduct = new Product { Name = "Valid Product", Price = 100m };
             var createResponse = await client.PostAsJsonAsync("/api/products", newProduct);
@@ -51,6 +64,7 @@ namespace OrderManagementSystem.Tests
         [Fact]
         public async Task CreateProduct_ReturnsCreatedProduct()
         {
+            await CleanupDatabaseAsync();
             // Arrange
             var client = _factory.CreateClient();
             var newProduct = new Product { Name = "Integration Test Product", Price = 12.34m };
@@ -69,6 +83,7 @@ namespace OrderManagementSystem.Tests
         [Fact]
         public async Task GetProducts_ReturnsListIncludingCreatedProduct()
         {
+            await CleanupDatabaseAsync();
             // Arrange
             var client = _factory.CreateClient();
             var newProduct = new Product { Name = "List Test Product", Price = 55.55m };
@@ -89,6 +104,7 @@ namespace OrderManagementSystem.Tests
         [Fact]
         public async Task GetProducts_SearchByName_ReturnsMatchingProducts()
         {
+            await CleanupDatabaseAsync();
             // Arrange
             var client = _factory.CreateClient();
             var productsToCreate = new[]
@@ -101,7 +117,9 @@ namespace OrderManagementSystem.Tests
             foreach (var p in productsToCreate)
             {
                 var resp = await client.PostAsJsonAsync("/api/products", p);
-                resp.EnsureSuccessStatusCode();
+                Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+                var created = await resp.Content.ReadFromJsonAsync<Product>();
+                Assert.NotNull(created);
             }
 
             // Act
@@ -121,6 +139,7 @@ namespace OrderManagementSystem.Tests
         [Fact]
         public async Task ApplyDiscountToProduct_StoresDiscountCorrectly()
         {
+            await CleanupDatabaseAsync();
             // Arrange
             var client = _factory.CreateClient();
             var newProduct = new Product { Name = "Discounted Product", Price = 100m };
