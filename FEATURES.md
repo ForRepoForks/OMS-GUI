@@ -6,7 +6,7 @@ This document tracks the features and work chunks for the Order Management Syste
 
 ## 1. Project Setup & Architecture
 - [x] Initialize .NET solution and git repository
-- [ ] Set up project structure (NTier/Onion architecture)
+- [x] Set up project structure (Simple monolithic architecture; all logic in API project, organized by folders)
 - [ ] Configure database connection (MongoDB or PostgreSQL)
 - [ ] Add README with prerequisites and launch steps
 - [ ] Create and maintain a single Docker Compose file at the project root to orchestrate all services (API, database, etc.)
