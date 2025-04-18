@@ -36,6 +36,12 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Install EF Core CLI
+      run: dotnet tool install --global dotnet-ef
+    - name: Apply Migrations
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
+      run: dotnet ef database update --project OrderManagementSystem.API/OrderManagementSystem.API.csproj
     - name: Test
       env:
         ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=omsdb;Username=postgres;Password=password"
