@@ -73,5 +73,21 @@ namespace OrderManagementSystem.API.Controllers
             };
             return CreatedAtAction(nameof(CreateOrder), new { id = order.Id }, response);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<List<OrderResponse>>> GetOrders()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.Items)
+                .ToListAsync();
+
+            var response = orders.Select(order => new OrderResponse
+            {
+                Id = order.Id,
+                Items = order.Items.Select(i => new OrderItemResponse { ProductId = i.ProductId, Quantity = i.Quantity }).ToList()
+            }).ToList();
+
+            return Ok(response);
+        }
     }
 }
