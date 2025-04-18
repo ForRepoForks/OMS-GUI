@@ -110,6 +110,18 @@ All list endpoints (`GET /api/products`, `GET /api/orders`) support pagination:
 - Connection strings are managed in `appsettings.json` and Docker Compose environment variables.
 - API uses: `Host=db;Port=5432;Database=omsdb;Username=omsuser;Password=omspassword`
 
+## Default Credentials (Development Only)
+- The default database credentials (`omsuser` / `omspassword`) and connection strings provided in `docker-compose.yml` and `appsettings.json` are **for local development and testing only**.
+- **Never use these credentials in production!**
+- For production deployments:
+  - Always generate strong, unique database usernames and passwords.
+  - Store secrets in environment variables, secret managers, or secure configuration providers (e.g., Azure Key Vault, AWS Secrets Manager).
+  - Do not commit production secrets or credentials to source control.
+  - Update your deployment pipeline to inject secrets securely at runtime.
+  - Review your cloud provider's best practices for secret management.
+
+See the [Docker Compose file](./docker-compose.yml) and [appsettings.json](./OrderManagementSystem.API/appsettings.json) for where these defaults are set.
+
 ## API Documentation
 - Swagger UI is available at [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html) when running via Docker Compose (default setup).
 - **Note:** If running in Visual Studio or with a different Docker port mapping, the port may vary (e.g., https://localhost:32773/swagger/index.html). Always check your terminal or Visual Studio output for the correct port.
