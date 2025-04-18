@@ -53,5 +53,37 @@ namespace OrderManagementSystem.Tests
             Assert.NotNull(products);
             Assert.Contains(products, p => p.Id == created.Id && p.Name == newProduct.Name && p.Price == newProduct.Price);
         }
+
+        [Fact]
+        public async Task GetProducts_SearchByName_ReturnsMatchingProducts()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var productsToCreate = new[]
+            {
+                new Product { Name = "Apple", Price = 1.00m },
+                new Product { Name = "Banana", Price = 2.00m },
+                new Product { Name = "Green Apple", Price = 1.50m },
+                new Product { Name = "Pineapple", Price = 3.00m }
+            };
+            foreach (var p in productsToCreate)
+            {
+                var resp = await client.PostAsJsonAsync("/api/products", p);
+                resp.EnsureSuccessStatusCode();
+            }
+
+            // Act
+            var response = await client.GetAsync("/api/products?name=Apple");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var products = await response.Content.ReadFromJsonAsync<Product[]>();
+            Assert.NotNull(products);
+            Assert.All(products, p => Assert.Contains("Apple", p.Name));
+            Assert.Contains(products, p => p.Name == "Apple");
+            Assert.Contains(products, p => p.Name == "Green Apple");
+            Assert.Contains(products, p => p.Name == "Pineapple");
+            Assert.DoesNotContain(products, p => p.Name == "Banana");
+        }
     }
 }
