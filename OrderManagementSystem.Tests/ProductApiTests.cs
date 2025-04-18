@@ -34,5 +34,24 @@ namespace OrderManagementSystem.Tests
             Assert.Equal(newProduct.Price, created.Price);
             Assert.True(created.Id > 0);
         }
+        [Fact]
+        public async Task GetProducts_ReturnsListIncludingCreatedProduct()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "List Test Product", Price = 55.55m };
+            var createResponse = await client.PostAsJsonAsync("/api/products", newProduct);
+            createResponse.EnsureSuccessStatusCode();
+            var created = await createResponse.Content.ReadFromJsonAsync<Product>();
+
+            // Act
+            var response = await client.GetAsync("/api/products");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var products = await response.Content.ReadFromJsonAsync<Product[]>();
+            Assert.NotNull(products);
+            Assert.Contains(products, p => p.Id == created.Id && p.Name == newProduct.Name && p.Price == newProduct.Price);
+        }
     }
 }
