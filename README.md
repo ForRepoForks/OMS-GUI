@@ -48,6 +48,7 @@ A simple order management system API for retailers, built with .NET 8 and Postgr
 
 ## Additional Notes
 - The project is designed for rapid MVP delivery and can be extended with additional features, validation, and performance optimizations as needed.
+- **Design Choice:** The code structure is a simple monolith by design to enable fast iteration and delivery of a minimum viable product (MVP). For larger-scale or long-term projects, introducing layered or modular architecture (e.g., NTier, Onion) is recommended to improve maintainability and scalability.
 
 3. **Apply EF Core migrations (if/when implemented):**
    ```sh
