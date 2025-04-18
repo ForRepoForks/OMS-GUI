@@ -171,9 +171,10 @@ namespace OrderManagementSystem.Tests
             var client = _factory.CreateClient();
             var response = await client.GetAsync("/api/orders");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var orders = await response.Content.ReadFromJsonAsync<List<OrderResponse>>();
-            Assert.NotNull(orders);
-            Assert.Empty(orders);
+            var paged = await response.Content.ReadFromJsonAsync<PagedResult<OrderResponse>>();
+            Assert.NotNull(paged);
+            Assert.NotNull(paged.Items);
+            Assert.Empty(paged.Items);
         }
 
         [Fact]
@@ -248,7 +249,7 @@ namespace OrderManagementSystem.Tests
         }
         public class OrderInvoiceProduct
         {
-            public string ProductName { get; set; }
+            public required string ProductName { get; set; }
             public int Quantity { get; set; }
             public decimal DiscountPercent { get; set; }
             public decimal Amount { get; set; }
@@ -288,11 +289,12 @@ namespace OrderManagementSystem.Tests
             // Act
             var response = await client.GetAsync("/api/orders");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var orders = await response.Content.ReadFromJsonAsync<List<OrderResponse>>();
-            Assert.NotNull(orders);
-            Assert.True(orders.Count == 2); // Should only be the two we created
-            Assert.Contains(orders, o => o.Id == created1.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod1.Id && o.Items[0].Quantity == 2);
-            Assert.Contains(orders, o => o.Id == created2.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod2.Id && o.Items[0].Quantity == 3);
+            var paged = await response.Content.ReadFromJsonAsync<PagedResult<OrderResponse>>();
+            Assert.NotNull(paged);
+            Assert.NotNull(paged.Items);
+            Assert.True(paged.Items.Count == 2); // Should only be the two we created
+            Assert.Contains(paged.Items, o => o.Id == created1.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod1.Id && o.Items[0].Quantity == 2);
+            Assert.Contains(paged.Items, o => o.Id == created2.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod2.Id && o.Items[0].Quantity == 3);
         }
 
         [Fact]
@@ -359,7 +361,7 @@ namespace OrderManagementSystem.Tests
 
         public class DiscountedProductReportItem
         {
-            public string ProductName { get; set; }
+            public required string ProductName { get; set; }
             public decimal DiscountPercent { get; set; }
             public int NumberOfOrders { get; set; }
             public decimal TotalAmount { get; set; }

@@ -96,9 +96,10 @@ namespace OrderManagementSystem.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var products = await response.Content.ReadFromJsonAsync<Product[]>();
-            Assert.NotNull(products);
-            Assert.Contains(products, p => p.Id == created.Id && p.Name == newProduct.Name && p.Price == newProduct.Price);
+            var paged = await response.Content.ReadFromJsonAsync<PagedResult<Product>>();
+            Assert.NotNull(paged);
+            Assert.NotNull(paged.Items);
+            Assert.Contains(paged.Items, p => p.Id == created.Id && p.Name == newProduct.Name && p.Price == newProduct.Price);
         }
 
         [Fact]
@@ -127,13 +128,14 @@ namespace OrderManagementSystem.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var products = await response.Content.ReadFromJsonAsync<Product[]>();
-            Assert.NotNull(products);
-            Assert.All(products, p => Assert.True(p.Name.IndexOf("Apple", System.StringComparison.OrdinalIgnoreCase) >= 0));
-            Assert.Contains(products, p => p.Name == "Apple");
-            Assert.Contains(products, p => p.Name == "Green Apple");
-            Assert.Contains(products, p => p.Name == "Pineapple");
-            Assert.DoesNotContain(products, p => p.Name == "Banana");
+            var paged = await response.Content.ReadFromJsonAsync<PagedResult<Product>>();
+            Assert.NotNull(paged);
+            Assert.NotNull(paged.Items);
+            Assert.All(paged.Items, p => Assert.True(p.Name.IndexOf("Apple", System.StringComparison.OrdinalIgnoreCase) >= 0));
+            Assert.Contains(paged.Items, p => p.Name == "Apple");
+            Assert.Contains(paged.Items, p => p.Name == "Green Apple");
+            Assert.Contains(paged.Items, p => p.Name == "Pineapple");
+            Assert.DoesNotContain(paged.Items, p => p.Name == "Banana");
         }
 
         [Fact]
