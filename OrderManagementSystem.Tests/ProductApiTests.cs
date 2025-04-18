@@ -79,7 +79,7 @@ namespace OrderManagementSystem.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var products = await response.Content.ReadFromJsonAsync<Product[]>();
             Assert.NotNull(products);
-            Assert.All(products, p => Assert.Contains("Apple", p.Name));
+            Assert.All(products, p => Assert.True(p.Name.IndexOf("Apple", System.StringComparison.OrdinalIgnoreCase) >= 0));
             Assert.Contains(products, p => p.Name == "Apple");
             Assert.Contains(products, p => p.Name == "Green Apple");
             Assert.Contains(products, p => p.Name == "Pineapple");

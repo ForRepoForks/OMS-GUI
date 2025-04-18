@@ -25,9 +25,14 @@ namespace OrderManagementSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts([FromQuery] string? name)
         {
-            var products = await _context.Products.ToListAsync();
+            var query = _context.Products.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(name.ToLower()));
+            }
+            var products = await query.ToListAsync();
             return Ok(products);
         }
     }
