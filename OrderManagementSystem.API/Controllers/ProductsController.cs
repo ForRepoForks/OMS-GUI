@@ -24,8 +24,16 @@ namespace OrderManagementSystem.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("Price", ex.Message);
+                return BadRequest(ModelState);
+            }
             return CreatedAtAction(nameof(CreateProduct), new { id = product.Id }, product);
         }
 
@@ -61,25 +69,38 @@ public async Task<ActionResult<PagedResult<Product>>> GetProducts(
         [HttpPut("{id}/discount")]
         public async Task<ActionResult<Product>> ApplyDiscount(int id, [FromBody] DiscountDto discount)
         {
-            if (!ModelState.IsValid)
+            // Allow both fields to be zero to indicate removal
+            if ((discount.Percentage < 0 || discount.Percentage > 100) || (discount.QuantityThreshold < 0))
             {
+                ModelState.AddModelError("Discount", "Discount percentage must be between 0 and 100 and quantity threshold cannot be negative.");
                 return BadRequest(ModelState);
             }
             var product = await _context.Products.FindAsync(id);
             if (product == null)
                 return NotFound();
 
-            product.DiscountPercentage = discount.Percentage;
-            product.DiscountQuantityThreshold = discount.QuantityThreshold;
+            if (discount.Percentage == 0 && discount.QuantityThreshold == 0)
+            {
+                product.DiscountPercentage = null;
+                product.DiscountQuantityThreshold = null;
+            }
+            else
+            {
+                if (discount.QuantityThreshold < 1)
+                {
+                    ModelState.AddModelError("Discount", "Quantity threshold must be greater than 0 unless removing discount.");
+                    return BadRequest(ModelState);
+                }
+                product.DiscountPercentage = discount.Percentage;
+                product.DiscountQuantityThreshold = discount.QuantityThreshold;
+            }
             await _context.SaveChangesAsync();
             return Ok(product);
         }
 
         public class DiscountDto
         {
-            [Range(0, 100, ErrorMessage = "Discount percentage must be between 0 and 100.")]
             public decimal Percentage { get; set; }
-            [Range(1, int.MaxValue, ErrorMessage = "Quantity threshold must be greater than 0.")]
             public int QuantityThreshold { get; set; }
         }
     }

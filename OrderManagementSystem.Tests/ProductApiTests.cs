@@ -29,8 +29,8 @@ namespace OrderManagementSystem.Tests
         {
             await CleanupDatabaseAsync();
             var client = _factory.CreateClient();
-            var product = new Product { Name = name, Price = price };
-            var response = await client.PostAsJsonAsync("/api/products", product);
+            var payload = new { Name = name, Price = price };
+            var response = await client.PostAsJsonAsync("/api/products", payload);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
@@ -67,7 +67,7 @@ namespace OrderManagementSystem.Tests
             await CleanupDatabaseAsync();
             // Arrange
             var client = _factory.CreateClient();
-            var newProduct = new Product { Name = "Integration Test Product", Price = 12.34m };
+            var newProduct = new Product { Name = new string('A', 256), Price = 123.45m };
 
             // Act
             var response = await client.PostAsJsonAsync("/api/products", newProduct);
@@ -80,6 +80,73 @@ namespace OrderManagementSystem.Tests
             Assert.Equal(newProduct.Price, created.Price);
             Assert.True(created.Id > 0);
         }
+
+        [Fact]
+        public async Task CreateProduct_WithMaxPrice_ReturnsCreatedProduct()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "MaxPrice", Price = decimal.MaxValue };
+            var response = await client.PostAsJsonAsync("/api/products", newProduct);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var created = await response.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(created);
+            Assert.Equal(decimal.MaxValue, created.Price);
+        }
+
+        [Fact]
+        public async Task ApplyDiscountToNonExistentProduct_ReturnsNotFound()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var discount = new { Percentage = 10, QuantityThreshold = 2 };
+            var response = await client.PutAsJsonAsync($"/api/products/99999/discount", discount);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task RemoveDiscountFromProduct_SetsDiscountToNull()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "Discounted Product", Price = 100m };
+            var createResponse = await client.PostAsJsonAsync("/api/products", newProduct);
+            createResponse.EnsureSuccessStatusCode();
+            var created = await createResponse.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(created);
+
+            var discount = new { Percentage = 15, QuantityThreshold = 10 };
+            var discountResponse = await client.PutAsJsonAsync($"/api/products/{created.Id}/discount", discount);
+            discountResponse.EnsureSuccessStatusCode();
+            var updated = await discountResponse.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(updated);
+            Assert.Equal(15, updated.DiscountPercentage);
+            Assert.Equal(10, updated.DiscountQuantityThreshold);
+
+            // Remove discount
+            var removeDiscount = new { Percentage = 0, QuantityThreshold = 0 };
+            var removeResponse = await client.PutAsJsonAsync($"/api/products/{created.Id}/discount", removeDiscount);
+            removeResponse.EnsureSuccessStatusCode();
+            var removed = await removeResponse.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(removed);
+            Assert.True(removed.DiscountPercentage == 0 || removed.DiscountPercentage == null);
+            Assert.True(removed.DiscountQuantityThreshold == 0 || removed.DiscountQuantityThreshold == null);
+        }
+
+        [Fact]
+        public async Task CreateProduct_ResponseSchema_IsValid()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "SchemaTest", Price = 10m };
+            var response = await client.PostAsJsonAsync("/api/products", newProduct);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var json = await response.Content.ReadAsStringAsync();
+            Assert.Contains("\"name\"", json.ToLower());
+            Assert.Contains("\"price\"", json.ToLower());
+            Assert.Contains("\"id\"", json.ToLower());
+        }
+
         [Fact]
         public async Task GetProducts_ReturnsListIncludingCreatedProduct()
         {
