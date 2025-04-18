@@ -294,5 +294,75 @@ namespace OrderManagementSystem.Tests
             Assert.Contains(orders, o => o.Id == created1.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod1.Id && o.Items[0].Quantity == 2);
             Assert.Contains(orders, o => o.Id == created2.Id && o.Items.Count == 1 && o.Items[0].ProductId == prod2.Id && o.Items[0].Quantity == 3);
         }
+
+        [Fact]
+        public async Task GetDiscountedProductReport_ReturnsCorrectReport()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+
+            // Create products: one with discount, one without, one with discount but never ordered above threshold
+            var prodDiscount = new Product { Name = "Discounted", Price = 100m, DiscountPercentage = 20m, DiscountQuantityThreshold = 2 };
+            var prodNoDiscount = new Product { Name = "NoDiscount", Price = 50m };
+            var prodUnusedDiscount = new Product { Name = "UnusedDiscount", Price = 80m, DiscountPercentage = 10m, DiscountQuantityThreshold = 5 };
+
+            var resp1 = await client.PostAsJsonAsync("/api/products", prodDiscount);
+            var resp2 = await client.PostAsJsonAsync("/api/products", prodNoDiscount);
+            var resp3 = await client.PostAsJsonAsync("/api/products", prodUnusedDiscount);
+            Assert.Equal(HttpStatusCode.Created, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, resp2.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, resp3.StatusCode);
+            var pDiscount = await resp1.Content.ReadFromJsonAsync<Product>();
+            var pNoDiscount = await resp2.Content.ReadFromJsonAsync<Product>();
+            var pUnusedDiscount = await resp3.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(pDiscount);
+            Assert.NotNull(pNoDiscount);
+            Assert.NotNull(pUnusedDiscount);
+
+            // Place orders:
+            // 1. Discounted product, quantity 2 (discount applies)
+            var order1 = new { items = new[] { new { productId = pDiscount.Id, quantity = 2 } } };
+            var respOrder1 = await client.PostAsJsonAsync("/api/orders", order1);
+            Assert.Equal(HttpStatusCode.Created, respOrder1.StatusCode);
+            // 2. Discounted product, quantity 1 (discount does not apply)
+            var order2 = new { items = new[] { new { productId = pDiscount.Id, quantity = 1 } } };
+            var respOrder2 = await client.PostAsJsonAsync("/api/orders", order2);
+            Assert.Equal(HttpStatusCode.Created, respOrder2.StatusCode);
+            // 3. Discounted product, quantity 3 (discount applies)
+            var order3 = new { items = new[] { new { productId = pDiscount.Id, quantity = 3 } } };
+            var respOrder3 = await client.PostAsJsonAsync("/api/orders", order3);
+            Assert.Equal(HttpStatusCode.Created, respOrder3.StatusCode);
+            // 4. NoDiscount product, quantity 4
+            var order4 = new { items = new[] { new { productId = pNoDiscount.Id, quantity = 4 } } };
+            var respOrder4 = await client.PostAsJsonAsync("/api/orders", order4);
+            Assert.Equal(HttpStatusCode.Created, respOrder4.StatusCode);
+            // 5. UnusedDiscount product, quantity 2 (below threshold)
+            var order5 = new { items = new[] { new { productId = pUnusedDiscount.Id, quantity = 2 } } };
+            var respOrder5 = await client.PostAsJsonAsync("/api/orders", order5);
+            Assert.Equal(HttpStatusCode.Created, respOrder5.StatusCode);
+
+            // Act: Call the report endpoint
+            var response = await client.GetAsync("/api/reports/discounted-products");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var report = await response.Content.ReadFromJsonAsync<List<DiscountedProductReportItem>>();
+            Assert.NotNull(report);
+            // Only the Discounted product should appear, since UnusedDiscount never met threshold
+            Assert.Single(report);
+            var discounted = report[0];
+            Assert.Equal(pDiscount.Name, discounted.ProductName);
+            Assert.Equal(pDiscount.DiscountPercentage, discounted.DiscountPercent);
+            // Orders where discount applied: order1 (2), order3 (3)
+            Assert.Equal(2, discounted.NumberOfOrders);
+            // Total amount: (100*2*0.8) + (100*3*0.8) = 160 + 240 = 400
+            Assert.Equal(400m, discounted.TotalAmount);
+        }
+
+        public class DiscountedProductReportItem
+        {
+            public string ProductName { get; set; }
+            public decimal DiscountPercent { get; set; }
+            public int NumberOfOrders { get; set; }
+            public decimal TotalAmount { get; set; }
+        }
     }
 }

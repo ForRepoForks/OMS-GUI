@@ -162,5 +162,42 @@ namespace OrderManagementSystem.API.Controllers
             public decimal DiscountPercent { get; set; }
             public decimal Amount { get; set; }
         }
+        [HttpGet("/api/reports/discounted-products")]
+        public async Task<IActionResult> GetDiscountedProductReport()
+        {
+            // Get all products with a discount
+            var discountedProducts = await _context.Products
+                .Where(p => p.DiscountPercentage != null && p.DiscountPercentage > 0 && p.DiscountQuantityThreshold != null)
+                .ToListAsync();
+
+            var report = new List<DiscountedProductReportItem>();
+            foreach (var product in discountedProducts)
+            {
+                // Find all order items where this product was ordered with quantity >= threshold
+                var orderItems = await _context.OrderItems
+                    .Where(oi => oi.ProductId == product.Id && oi.Quantity >= product.DiscountQuantityThreshold)
+                    .ToListAsync();
+                if (orderItems.Count == 0)
+                    continue;
+                var orderIdsWithDiscount = orderItems.Select(oi => oi.OrderId).Distinct().Count();
+                var totalAmount = orderItems.Sum(oi => oi.Quantity * product.Price * (1 - (product.DiscountPercentage ?? 0) / 100));
+                report.Add(new DiscountedProductReportItem
+                {
+                    ProductName = product.Name,
+                    DiscountPercent = product.DiscountPercentage ?? 0,
+                    NumberOfOrders = orderIdsWithDiscount,
+                    TotalAmount = totalAmount
+                });
+            }
+            return Ok(report);
+        }
+
+        public class DiscountedProductReportItem
+        {
+            public string ProductName { get; set; }
+            public decimal DiscountPercent { get; set; }
+            public int NumberOfOrders { get; set; }
+            public decimal TotalAmount { get; set; }
+        }
     }
 }
