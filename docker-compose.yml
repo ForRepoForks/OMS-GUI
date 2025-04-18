@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: oms_postgres
+    environment:
+      POSTGRES_USER: omsuser
+      POSTGRES_PASSWORD: omspassword
+      POSTGRES_DB: omsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - oms_network
+
+  api:
+    build:
+      context: .
+      dockerfile: OrderManagementSystem.API/Dockerfile
+    container_name: oms_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=omsdb;Username=omsuser;Password=omspassword
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+    networks:
+      - oms_network
+
+volumes:
+  db_data:
+
+networks:
+  oms_network:
+    driver: bridge
