@@ -37,7 +37,8 @@ To get started on a new development machine:
    ```
 
 6. **Access API documentation:**
-   - Open [http://localhost:5000/swagger](http://localhost:5000/swagger) in your browser for Swagger UI and endpoint documentation.
+   - Open [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html) in your browser for Swagger UI and endpoint documentation (default Docker setup).
+   - If running in Visual Studio or with a different Docker port mapping, the port may vary (e.g., https://localhost:32773/swagger/index.html).
 
 ---
 
@@ -110,7 +111,8 @@ All list endpoints (`GET /api/products`, `GET /api/orders`) support pagination:
 - API uses: `Host=db;Port=5432;Database=omsdb;Username=omsuser;Password=omspassword`
 
 ## API Documentation
-- Swagger UI is available at [http://localhost:5000/swagger](http://localhost:5000/swagger) when running locally.
+- Swagger UI is available at [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html) when running via Docker Compose (default setup).
+- **Note:** If running in Visual Studio or with a different Docker port mapping, the port may vary (e.g., https://localhost:32773/swagger/index.html). Always check your terminal or Visual Studio output for the correct port.
 
 ## Troubleshooting & Warnings
 - Some warnings about nullable reference types or EF Core version conflicts may appear during build/test. These do not affect functionality but can be addressed for code quality.
