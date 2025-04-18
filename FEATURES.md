@@ -40,8 +40,8 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Implement Order Invoice endpoint (show product name, quantity, discount %, amount, total)
 
 ## 5. Reporting
-- [ ] Write tests for Discounted Product Report endpoint (product name, discount %, number of orders, total amount)
-- [ ] Implement Discounted Product Report endpoint (product name, discount %, number of orders, total amount)
+- [x] Write tests for Discounted Product Report endpoint (product name, discount %, number of orders, total amount)
+- [x] Implement Discounted Product Report endpoint (product name, discount %, number of orders, total amount)
 
 ## 6. Documentation & Quality
 
