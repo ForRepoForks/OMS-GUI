@@ -9,6 +9,38 @@ namespace OrderManagementSystem.Tests
 {
     public class ProductApiTests : IClassFixture<WebApplicationFactory<OrderManagementSystem.API.Program>>
     {
+        [Theory]
+        [InlineData(null, 10)]
+        [InlineData("", 10)]
+        [InlineData("Valid Name", 0)]
+        [InlineData("Valid Name", -5)]
+        public async Task CreateProduct_InvalidInput_ReturnsBadRequest(string name, decimal price)
+        {
+            var client = _factory.CreateClient();
+            var product = new Product { Name = name, Price = price };
+            var response = await client.PostAsJsonAsync("/api/products", product);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(-1, 10)]
+        [InlineData(101, 10)]
+        [InlineData(10, 0)]
+        [InlineData(10, -5)]
+        public async Task ApplyDiscount_InvalidInput_ReturnsBadRequest(decimal percentage, int quantityThreshold)
+        {
+            var client = _factory.CreateClient();
+            var newProduct = new Product { Name = "Valid Product", Price = 100m };
+            var createResponse = await client.PostAsJsonAsync("/api/products", newProduct);
+            createResponse.EnsureSuccessStatusCode();
+            var created = await createResponse.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(created);
+
+            var discount = new { Percentage = percentage, QuantityThreshold = quantityThreshold };
+            var discountResponse = await client.PutAsJsonAsync($"/api/products/{created.Id}/discount", discount);
+            Assert.Equal(HttpStatusCode.BadRequest, discountResponse.StatusCode);
+        }
+
         private readonly WebApplicationFactory<OrderManagementSystem.API.Program> _factory;
 
         public ProductApiTests(WebApplicationFactory<OrderManagementSystem.API.Program> factory)
