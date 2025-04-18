@@ -177,6 +177,84 @@ namespace OrderManagementSystem.Tests
         }
 
         [Fact]
+        public async Task GetOrderInvoice_ReturnsCorrectInvoice()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+
+            // Create products
+            var product1 = new Product { Name = "Apple", Price = 10m };
+            var product2 = new Product { Name = "Banana", Price = 20m, DiscountPercentage = 25m, DiscountQuantityThreshold = 2 };
+            var resp1 = await client.PostAsJsonAsync("/api/products", product1);
+            var resp2 = await client.PostAsJsonAsync("/api/products", product2);
+            Assert.Equal(HttpStatusCode.Created, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, resp2.StatusCode);
+            var p1 = await resp1.Content.ReadFromJsonAsync<Product>();
+            var p2 = await resp2.Content.ReadFromJsonAsync<Product>();
+            Assert.NotNull(p1);
+            Assert.NotNull(p2);
+
+            // Place order: 1 Apple (no discount), 3 Banana (discount applies to 2+)
+            var orderRequest = new
+            {
+                items = new[]
+                {
+                    new { productId = p1.Id, quantity = 1 },
+                    new { productId = p2.Id, quantity = 3 }
+                }
+            };
+            var orderResp = await client.PostAsJsonAsync("/api/orders", orderRequest);
+            Assert.Equal(HttpStatusCode.Created, orderResp.StatusCode);
+            var createdOrder = await orderResp.Content.ReadFromJsonAsync<OrderResponse>();
+            Assert.NotNull(createdOrder);
+
+            // Act: get invoice
+            var invoiceResp = await client.GetAsync($"/api/orders/{createdOrder.Id}/invoice");
+            Assert.Equal(HttpStatusCode.OK, invoiceResp.StatusCode);
+            var invoice = await invoiceResp.Content.ReadFromJsonAsync<OrderInvoiceResponse>();
+            Assert.NotNull(invoice);
+            Assert.Equal(2, invoice.Products.Count);
+
+            var appleLine = invoice.Products.Find(x => x.ProductName == "Apple");
+            var bananaLine = invoice.Products.Find(x => x.ProductName == "Banana");
+            Assert.NotNull(appleLine);
+            Assert.NotNull(bananaLine);
+
+            // Apple: no discount
+            Assert.Equal(1, appleLine.Quantity);
+            Assert.Equal(0m, appleLine.DiscountPercent);
+            Assert.Equal(10m, appleLine.Amount);
+            // Banana: 25% discount applies to all 3 (since quantity >= threshold)
+            Assert.Equal(3, bananaLine.Quantity);
+            Assert.Equal(25m, bananaLine.DiscountPercent);
+            Assert.Equal(45m, bananaLine.Amount); // 20 * 3 * 0.75 = 45
+            // Total
+            Assert.Equal(55m, invoice.TotalAmount);
+        }
+
+        [Fact]
+        public async Task GetOrderInvoice_NonExistentOrder_ReturnsNotFound()
+        {
+            await CleanupDatabaseAsync();
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("/api/orders/99999/invoice");
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        public class OrderInvoiceResponse
+        {
+            public List<OrderInvoiceProduct> Products { get; set; } = new();
+            public decimal TotalAmount { get; set; }
+        }
+        public class OrderInvoiceProduct
+        {
+            public string ProductName { get; set; }
+            public int Quantity { get; set; }
+            public decimal DiscountPercent { get; set; }
+            public decimal Amount { get; set; }
+        }
+
+        [Fact]
         public async Task GetOrders_ReturnsCreatedOrdersWithItems()
         {
             await CleanupDatabaseAsync();

@@ -36,8 +36,8 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Input validation for order endpoints
 
 ## 4. Invoices
-- [ ] Write tests for Order Invoice endpoint (show product name, quantity, discount %, amount, total)
-- [ ] Implement Order Invoice endpoint (show product name, quantity, discount %, amount, total)
+- [x] Write tests for Order Invoice endpoint (show product name, quantity, discount %, amount, total)
+- [x] Implement Order Invoice endpoint (show product name, quantity, discount %, amount, total)
 
 ## 5. Reporting
 - [ ] Write tests for Discounted Product Report endpoint (product name, discount %, number of orders, total amount)

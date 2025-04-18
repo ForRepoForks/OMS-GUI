@@ -110,5 +110,57 @@ namespace OrderManagementSystem.API.Controllers
 
             return Ok(response);
         }
+        [HttpGet("{id}/invoice")]
+        public async Task<IActionResult> GetOrderInvoice(int id)
+        {
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
+            if (order == null)
+                return NotFound();
+
+            var invoiceProducts = new List<InvoiceProductDto>();
+            decimal total = 0m;
+            foreach (var item in order.Items)
+            {
+                var product = item.Product;
+                decimal discountPercent = 0m;
+                var discountPct = product.DiscountPercentage ?? 0m;
+                var discountQtyThreshold = product.DiscountQuantityThreshold ?? int.MaxValue;
+                if (discountPct > 0 && item.Quantity >= discountQtyThreshold)
+                {
+                    discountPercent = discountPct;
+                }
+                var lineAmount = product.Price * item.Quantity * (1 - discountPercent / 100);
+                invoiceProducts.Add(new InvoiceProductDto
+                {
+                    ProductName = product.Name,
+                    Quantity = item.Quantity,
+                    DiscountPercent = discountPercent,
+                    Amount = lineAmount
+                });
+                total += lineAmount;
+            }
+            var invoice = new InvoiceResponseDto
+            {
+                Products = invoiceProducts,
+                TotalAmount = total
+            };
+            return Ok(invoice);
+        }
+
+        public class InvoiceResponseDto
+        {
+            public List<InvoiceProductDto> Products { get; set; } = new();
+            public decimal TotalAmount { get; set; }
+        }
+        public class InvoiceProductDto
+        {
+            public string ProductName { get; set; }
+            public int Quantity { get; set; }
+            public decimal DiscountPercent { get; set; }
+            public decimal Amount { get; set; }
+        }
     }
 }
