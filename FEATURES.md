@@ -12,8 +12,8 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Create and maintain a single Docker Compose file at the project root to orchestrate all services (API, database, etc.)
 
 ## 2. Product Management
-- [ ] Write tests for Product entity/model (name, price)
-- [ ] Create Product entity/model (name, price)
+- [x] Write tests for Product entity/model (name, price)
+- [x] Create Product entity/model (name, price)
 - [ ] Write tests for Create Product API endpoint
 - [ ] Implement Create Product API endpoint
 - [ ] Write tests for Get/List Products API endpoint
