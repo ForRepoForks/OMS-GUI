@@ -58,13 +58,13 @@ This document tracks the features and work chunks for the Order Management Syste
 - **Action Item:** This must be addressed for future scalability and reliability. See commit history and test output for more details.
 
 ---
-- [ ] Add Swagger/OpenAPI API documentation
-- [ ] Add automated tests (unit/integration)
-- [ ] Add input validation for all endpoints
+- [x] Add Swagger/OpenAPI API documentation
+- [x] Add automated tests (unit/integration)
+- [x] Add input validation for all endpoints
 
 ## 7. Deployment & CI
-- [ ] Ensure all services (API, database, etc.) are orchestrated through the single Docker Compose file at the project root
-- [ ] Add Docker/Docker Compose for containerization
+- [x] Ensure all services (API, database, etc.) are orchestrated through the single Docker Compose file at the project root
+- [x] Add Docker/Docker Compose for containerization
 - [x] Set up Continuous Integration (CI)
 
 ---
