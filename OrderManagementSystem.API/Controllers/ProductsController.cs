@@ -35,5 +35,24 @@ namespace OrderManagementSystem.API.Controllers
             var products = await query.ToListAsync();
             return Ok(products);
         }
+
+        [HttpPut("{id}/discount")]
+        public async Task<ActionResult<Product>> ApplyDiscount(int id, [FromBody] DiscountDto discount)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return NotFound();
+
+            product.DiscountPercentage = discount.Percentage;
+            product.DiscountQuantityThreshold = discount.QuantityThreshold;
+            await _context.SaveChangesAsync();
+            return Ok(product);
+        }
+
+        public class DiscountDto
+        {
+            public decimal Percentage { get; set; }
+            public int QuantityThreshold { get; set; }
+        }
     }
 }
