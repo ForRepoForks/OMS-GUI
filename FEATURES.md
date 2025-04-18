@@ -9,7 +9,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Set up project structure (Simple monolithic architecture; all logic in API project, organized by folders)
 - [x] Configure database connection (MongoDB or PostgreSQL)
 - [x] Add README with prerequisites and launch steps
-- [ ] Create and maintain a single Docker Compose file at the project root to orchestrate all services (API, database, etc.)
+- [x] Create and maintain a single Docker Compose file at the project root to orchestrate all services (API, database, etc.)
 
 ## 2. Product Management
 - [ ] Write tests for Product entity/model (name, price)
