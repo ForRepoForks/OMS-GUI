@@ -26,7 +26,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Input validation for product endpoints
 
 ## 3. Order Management
-- [ ] Write tests for Order entity/model (with product list and quantities)
+- [x] Write tests for Order entity/model (with product list and quantities)
 - [ ] Create Order entity/model (with product list and quantities)
 - [ ] Write tests for Create Order API endpoint
 - [ ] Implement Create Order API endpoint
