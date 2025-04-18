@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "main", "feature/**" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "main" ]
 
 jobs:
   build:
@@ -30,27 +30,69 @@ jobs:
           --health-retries 5
     steps:
     - uses: actions/checkout@v4
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore
-    - name: Install EF Core CLI
-      run: dotnet tool install --global dotnet-ef
-    - name: Add .NET tools to PATH
-      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+    - name: Install EF Core CLI and add to PATH
+      run: |
+        dotnet tool install --global dotnet-ef
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+    # Wait for Postgres to be ready (extra robust)
+    - name: Wait for Postgres
+      run: |
+        for i in {1..10}; do
+          pg_isready -h localhost -p 5432 -U postgres && echo "Postgres is ready!" && break
+          echo "Waiting for Postgres..."
+          sleep 3
+        done
+
+    # Migration check: fail if there are pending model changes
+    - name: Check for pending EF Core migrations
+      run: |
+        dotnet ef migrations add _TempMigrationCheck --project OrderManagementSystem.API/OrderManagementSystem.API.csproj || true
+        if git diff --exit-code; then
+          echo "No pending model changes."
+        else
+          echo "You have pending model changes that are not reflected in migrations. Please add them." && exit 1
+        fi
+        # Clean up temp migration if created
+        if [ -d "OrderManagementSystem.API/Migrations" ]; then
+          rm -f OrderManagementSystem.API/Migrations/*_TempMigrationCheck.cs
+          rm -f OrderManagementSystem.API/Migrations/*_TempMigrationCheck.Designer.cs
+        fi
+
     - name: Apply Migrations
       run: dotnet ef database update --project OrderManagementSystem.API/OrderManagementSystem.API.csproj
+
+    # Start API server (ensure it listens on port 5000 for CI)
     - name: Start API server
       run: |
-        dotnet run --project OrderManagementSystem.API/OrderManagementSystem.API.csproj &
+        dotnet run --project OrderManagementSystem.API/OrderManagementSystem.API.csproj --urls http://localhost:5000 &
         for i in {1..10}; do
           nc -z localhost 5000 && echo "API is up!" && break
           echo "Waiting for API to start..."
           sleep 2
         done
+
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+    # SECURITY NOTE: For production, use GitHub secrets for sensitive data like database passwords.
