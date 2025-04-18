@@ -16,7 +16,7 @@ This document tracks the features and work chunks for the Order Management Syste
 - [x] Create Product entity/model (name, price)
 - [x] Write tests for Create Product API endpoint
 - [x] Implement Create Product API endpoint
-- [ ] Write tests for Get/List Products API endpoint
+- [x] Write tests for Get/List Products API endpoint
 - [ ] Implement Get/List Products API endpoint
 - [ ] Write tests for Product search by name
 - [ ] Implement Product search by name
