@@ -50,6 +50,27 @@ namespace OrderManagementSystem.API.Controllers
             if (!ModelState.IsValid || request.Items == null || request.Items.Count == 0)
                 return BadRequest(ModelState);
 
+            // Additional validation: ensure all items have both ProductId and Quantity set
+            foreach (var item in request.Items)
+            {
+                // ProductId is required (should not be 0 or default)
+                // Quantity is required and must be >= 1
+                if (item == null || item.ProductId == 0 || item.Quantity < 1)
+                {
+                    // Add model errors for clarity (optional)
+                    if (item == null)
+                        ModelState.AddModelError("Items", "Order item cannot be null.");
+                    else
+                    {
+                        if (item.ProductId == 0)
+                            ModelState.AddModelError("Items.ProductId", "ProductId is required and must be greater than 0.");
+                        if (item.Quantity < 1)
+                            ModelState.AddModelError("Items.Quantity", "Quantity must be at least 1.");
+                    }
+                    return BadRequest(ModelState);
+                }
+            }
+
             // Validate all product IDs
             var productIds = request.Items.Select(i => i.ProductId).Distinct().ToList();
             var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
