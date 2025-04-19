@@ -1,5 +1,7 @@
 #root {
   min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
   margin: 0;
   padding: 0;
   text-align: initial;
@@ -46,12 +48,18 @@
 .sidebar-link:hover {
   background: #393e6a;
 }
+.sidebar-link.active {
+  background: #eebbc3;
+  color: #232946;
+  font-weight: bold;
+}
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  width: 100%;
 }
 
 .topbar {
@@ -69,6 +77,8 @@
   flex: 1;
   padding: 2rem 2.5rem;
   background: #f7f8fa;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 700px) {

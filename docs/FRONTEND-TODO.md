@@ -14,8 +14,8 @@ This list focuses on building a minimal, realistic order management system front
 
 ## 3. UI/UX Design
 - [x] Design a minimal real-app layout (sidebar/topbar, main content area).
-- [ ] Add navigation for main sections: Orders, (optionally Customers/Products).
-- [ ] Use modern UI components (tables, forms, dialogs).
+- [x] Add navigation for main sections: Orders, (optionally Customers/Products).
+- [x] Use modern UI components (tables, forms, dialogs).
 
 ## 4. Core Features for Order Management
 - [ ] Orders List Page: View all orders in a table with basic info.

@@ -1,4 +1,5 @@
-import './App.css'
+import './App.css';
+import { NavLink, Outlet } from 'react-router-dom';
 
 function App() {
   return (
@@ -6,10 +7,9 @@ function App() {
       <aside className="sidebar">
         <div className="sidebar-header">OMS</div>
         <nav className="sidebar-nav">
-          <a href="#" className="sidebar-link">Dashboard</a>
-          <a href="#" className="sidebar-link">Orders</a>
-          <a href="#" className="sidebar-link">Products</a>
-          <a href="#" className="sidebar-link">Customers</a>
+          <NavLink to="/orders" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Orders</NavLink>
+          <NavLink to="/customers" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Customers</NavLink>
+          <NavLink to="/products" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Products</NavLink>
         </nav>
       </aside>
       <main className="main-content">
@@ -17,8 +17,7 @@ function App() {
           <span className="topbar-title">Order Management System</span>
         </header>
         <section className="content-area">
-          <h2>Welcome!</h2>
-          <p>This is your main content area. Select a section from the sidebar.</p>
+          <Outlet />
         </section>
       </main>
     </div>
