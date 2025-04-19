@@ -41,7 +41,7 @@ export default function Orders() {
   }, []);
 
   const handleAdd = () => {
-    setEditingOrder({ customer: '', product: '', quantity: 1 });
+    setEditingOrder(undefined);
     setDialogOpen(true);
   };
 
