@@ -3,6 +3,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import OrderDialog from '../components/OrderDialog';
+import OrderDetailsDialog from '../components/OrderDetailsDialog';
 
 import api from '../api';
 
@@ -14,7 +15,7 @@ export default function Orders() {
   const [error, setError] = React.useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefined);
+  const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefined);
 
   React.useEffect(() => {
     setLoading(true);
@@ -70,6 +71,18 @@ const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefi
     setDialogOpen(false);
   };
 
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
+  const [viewingOrder, setViewingOrder] = React.useState<Order | undefined>(undefined);
+
+  const handleView = (order: Order) => {
+    setViewingOrder(order);
+    setDetailsOpen(true);
+  };
+  const handleDetailsClose = () => {
+    setDetailsOpen(false);
+    setViewingOrder(undefined);
+  };
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'customer', headerName: 'Customer', flex: 1 },
@@ -78,9 +91,12 @@ const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefi
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 120,
+      width: 170,
       renderCell: (params) => (
-        <Button size="small" onClick={() => handleEdit(params.row)} variant="outlined">Edit</Button>
+        <>
+          <Button size="small" onClick={() => handleView(params.row)} style={{ marginRight: 8 }} variant="outlined">View</Button>
+          <Button size="small" onClick={() => handleEdit(params.row)} variant="outlined">Edit</Button>
+        </>
       ),
       sortable: false,
       filterable: false,
@@ -116,11 +132,16 @@ const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefi
         )}
       </div>
       <OrderDialog
-  open={dialogOpen}
-  onClose={handleClose}
-  order={editingOrder}
-  onSave={handleSave}
-/>
+        open={dialogOpen}
+        onClose={handleClose}
+        order={editingOrder}
+        onSave={handleSave}
+      />
+      <OrderDetailsDialog
+        open={detailsOpen}
+        onClose={handleDetailsClose}
+        order={viewingOrder}
+      />
     </Stack>
   );
 }
