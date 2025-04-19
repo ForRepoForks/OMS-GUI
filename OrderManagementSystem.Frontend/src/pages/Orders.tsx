@@ -4,24 +4,54 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import OrderDialog from '../components/OrderDialog';
 
-const initialOrders = [
-  { id: 1, customer: 'Alice', product: 'Widget', quantity: 3 },
-  { id: 2, customer: 'Bob', product: 'Gadget', quantity: 1 },
-  { id: 3, customer: 'Charlie', product: 'Thingamajig', quantity: 2 },
-];
+import api from '../api';
+
+export type Order = { id?: number; customer: string; product: string; quantity: number };
 
 export default function Orders() {
-  const [orders, setOrders] = React.useState(initialOrders);
+  const [orders, setOrders] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [editingOrder, setEditingOrder] = React.useState<{ id?: number; customer: string; product: string; quantity: number; } | undefined>(undefined);
+
+const [editingOrder, setEditingOrder] = React.useState<Order | undefined>(undefined);
+
+  React.useEffect(() => {
+    setLoading(true);
+    setError(null);
+    api.get('/api/orders')
+      .then(res => {
+        // Map backend data to table format
+        // If API returns paged result: { items: [...], ... }
+        const items = res.data.items || res.data;
+        // Flatten items for table: show first product/customer for MVP
+        const mapped = items.map((order: any) => ({
+          id: order.id,
+          customer: order.customerName || 'N/A',
+          product: order.items && order.items[0] ? `Product #${order.items[0].productId}` : 'N/A',
+          quantity: order.items && order.items[0] ? order.items[0].quantity : 0,
+        }));
+        setOrders(mapped);
+      })
+      .catch(_err => {
+        setError('Failed to load orders');
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleAdd = () => {
-    setEditingOrder(undefined);
+    setEditingOrder({ customer: '', product: '', quantity: 1 });
     setDialogOpen(true);
   };
 
   const handleEdit = (order: any) => {
-    setEditingOrder(order);
+    // Ensure all fields are present
+    setEditingOrder({
+      id: order.id,
+      customer: order.customer ?? '',
+      product: order.product ?? '',
+      quantity: order.quantity ?? 1,
+    });
     setDialogOpen(true);
   };
 
@@ -29,7 +59,7 @@ export default function Orders() {
     setDialogOpen(false);
   };
 
-  const handleSave = (order: any) => {
+  const handleSave = (order: Order) => {
     setOrders((prev) => {
       if (order.id) {
         return prev.map((o) => (o.id === order.id ? order : o));
@@ -64,20 +94,33 @@ export default function Orders() {
         <h2 style={{ margin: 0 }}>Orders</h2>
         <Button variant="contained" onClick={handleAdd}>New Order</Button>
       </Stack>
-      <div style={{ height: 350, width: '100%', background: '#fff', borderRadius: 8 }}>
-        <DataGrid
-          rows={orders}
-          columns={columns}
-          pageSizeOptions={[5]}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 5, page: 0 },
-            },
-          }}
-          disableRowSelectionOnClick
-        />
+      <div style={{ height: 600, width: '100%', background: '#fff', borderRadius: 8, position: 'relative' }}>
+        {loading ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <span>Loading...</span>
+          </div>
+        ) : error ? (
+          <div style={{ color: 'red', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>{error}</div>
+        ) : (
+          <DataGrid
+            rows={orders}
+            columns={columns}
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+            }}
+            disableRowSelectionOnClick
+          />
+        )}
       </div>
-      <OrderDialog open={dialogOpen} onClose={handleClose} order={editingOrder} onSave={handleSave} />
+      <OrderDialog
+  open={dialogOpen}
+  onClose={handleClose}
+  order={editingOrder}
+  onSave={handleSave}
+/>
     </Stack>
   );
 }

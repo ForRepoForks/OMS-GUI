@@ -10,6 +10,14 @@ namespace OrderManagementSystem.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    policy => policy
+                        .AllowAnyOrigin() // TEMPORARY: allow all origins for local development
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+            });
             builder.Services.AddAuthorization();
     builder.Services.AddDbContext<OrderManagementSystem.API.Data.OrderManagementContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -29,6 +37,8 @@ namespace OrderManagementSystem.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowFrontend");
 
             // Register ArgumentExceptionMiddleware before controllers
             app.UseMiddleware<OrderManagementSystem.API.ArgumentExceptionMiddleware>();

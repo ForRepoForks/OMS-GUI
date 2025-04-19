@@ -18,7 +18,7 @@ This list focuses on building a minimal, realistic order management system front
 - [x] Use modern UI components (tables, forms, dialogs).
 
 ## 4. Core Features for Order Management
-- [ ] Orders List Page: View all orders in a table with basic info.
+- [x] Orders List Page: View all orders in a table with basic info.
 - [ ] Order Details Page: View details of a selected order.
 - [ ] Create/Edit Order Page: Form to create or update an order.
 - [ ] Delete Order: Ability to delete an order from the list/details.
