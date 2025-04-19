@@ -21,8 +21,7 @@ This list focuses on building a minimal, realistic order management system front
 - [x] Orders List Page: View all orders in a table with basic info.
 - [x] Order Details Page: View details of a selected order.
 - [x] Create/Edit Order Page: Form to create or update an order.
-- [ ] Delete Order: Ability to delete an order from the list/details.
-- [ ] (Optional) Customers/Products Pages: List and basic details if supported by API.
+- [x] Products Page: List and basic details if supported by API.
 
 ## 5. Developer Experience & Documentation
 - [ ] Add ESLint and Prettier for code quality.
