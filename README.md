@@ -31,12 +31,37 @@ To get started on a new development machine:
    docker compose exec api dotnet ef database update
    ```
 
-5. **Run automated tests:**
+5. **Run the Front-End (React GUI)**
+
+The front-end is a React + TypeScript app located in `OrderManagementSystem.Frontend`.
+
+### Prerequisites
+- [Node.js (18+ recommended)](https://nodejs.org/)
+- [npm](https://www.npmjs.com/)
+
+### Setup & Start
+1. Open a terminal and navigate to the front-end directory:
+   ```sh
+   cd OrderManagementSystem.Frontend
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Start the development server:
+   ```sh
+   npm run dev
+   ```
+   - The app will be available at [http://localhost:5173](http://localhost:5173)
+
+For more details, see `OrderManagementSystem.Frontend/README.md`.
+
+6. **Run automated tests:**
    ```sh
    dotnet test
    ```
 
-6. **Access API documentation:**
+7. **Access API documentation:**
    - Open [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html) in your browser for Swagger UI and endpoint documentation (default Docker setup).
    - If running in Visual Studio or with a different Docker port mapping, the port may vary (e.g., https://localhost:32773/swagger/index.html).
 

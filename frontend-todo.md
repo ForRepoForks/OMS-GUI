@@ -3,9 +3,9 @@
 This list focuses on building a minimal, realistic order management system front-end, limited to 8 hours of work. The UI should resemble a real app, with basic pages and flows for managing orders (and optionally customers/products if supported by the API).
 
 ## 1. Project Setup
-- [ ] Create a new directory for the React front-end (e.g., `frontend`).
-- [ ] Initialize a new React project (e.g., with Create React App or Vite) with TypeScript.
-- [ ] Add a basic README for the front-end and update the main project README with run instructions.
+- [x] Create a new directory for the React front-end (e.g., `frontend`).
+- [x] Initialize a new React project (e.g., with Create React App or Vite) with TypeScript.
+- [x] Add a basic README for the front-end and update the main project README with run instructions.
 
 ## 2. API Exploration & Integration
 - [ ] Review/document available API endpoints (from backend code or Swagger/OpenAPI if available).
