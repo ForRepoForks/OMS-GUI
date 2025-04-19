@@ -9,6 +9,7 @@ This directory contains key documentation for the Order Management System projec
 | [FRONTEND-TODO.md](FRONTEND-TODO.md) | Frontend development todo list and progress tracking |
 | [CODE_REVIEW_ISSUES.md](CODE_REVIEW_ISSUES.md) | Issues and notes from code reviews |
 | [ORDER-MANAGEMENT-EXERCISE.md](ORDER-MANAGEMENT-EXERCISE.md) | Project exercise description and requirements |
+| [CORS-SETUP.md](CORS-SETUP.md) | CORS setup and troubleshooting for local frontend/backend development |
 
 ---
 

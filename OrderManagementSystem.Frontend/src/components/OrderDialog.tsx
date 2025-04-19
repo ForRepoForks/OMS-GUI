@@ -6,11 +6,13 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
+import type { Order } from '../pages/Orders';
+
 export interface OrderDialogProps {
   open: boolean;
   onClose: () => void;
-  order?: { id?: number; customer: string; product: string; quantity: number };
-  onSave: (order: { id?: number; customer: string; product: string; quantity: number }) => void;
+  order?: Order;
+  onSave: (order: Order) => void;
 }
 
 export default function OrderDialog({ open, onClose, order, onSave }: OrderDialogProps) {
