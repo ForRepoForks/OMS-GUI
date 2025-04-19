@@ -7,9 +7,24 @@ function App() {
       <aside className="sidebar">
         <div className="sidebar-header">OMS</div>
         <nav className="sidebar-nav">
-          <NavLink to="/orders" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Orders</NavLink>
-          <NavLink to="/customers" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Customers</NavLink>
-          <NavLink to="/products" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>Products</NavLink>
+          <NavLink
+            to="/orders"
+            className={({ isActive }) => (isActive ? 'sidebar-link active' : 'sidebar-link')}
+          >
+            Orders
+          </NavLink>
+          <NavLink
+            to="/customers"
+            className={({ isActive }) => (isActive ? 'sidebar-link active' : 'sidebar-link')}
+          >
+            Customers
+          </NavLink>
+          <NavLink
+            to="/products"
+            className={({ isActive }) => (isActive ? 'sidebar-link active' : 'sidebar-link')}
+          >
+            Products
+          </NavLink>
         </nav>
       </aside>
       <main className="main-content">
@@ -24,5 +39,4 @@ function App() {
   );
 }
 
-
-export default App
+export default App;

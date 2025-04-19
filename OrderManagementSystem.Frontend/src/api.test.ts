@@ -10,7 +10,8 @@ test('GET /api/products returns data', async () => {
   } catch (error: any) {
     // Optionally, improve error reporting
     throw new Error(
-      'API test error: ' + (error.response?.data ? JSON.stringify(error.response.data) : error.message)
+      'API test error: ' +
+        (error.response?.data ? JSON.stringify(error.response.data) : error.message),
     );
   }
 });

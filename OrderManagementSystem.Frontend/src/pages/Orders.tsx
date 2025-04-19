@@ -20,8 +20,9 @@ export default function Orders() {
   React.useEffect(() => {
     setLoading(true);
     setError(null);
-    api.get('/api/orders')
-      .then(res => {
+    api
+      .get('/api/orders')
+      .then((res) => {
         // Map backend data to table format
         // If API returns paged result: { items: [...], ... }
         const items = res.data.items || res.data;
@@ -34,7 +35,7 @@ export default function Orders() {
         }));
         setOrders(mapped);
       })
-      .catch(_err => {
+      .catch((_err) => {
         setError('Failed to load orders');
       })
       .finally(() => setLoading(false));
@@ -65,7 +66,10 @@ export default function Orders() {
       if (order.id) {
         return prev.map((o) => (o.id === order.id ? order : o));
       } else {
-        return [...prev, { ...order, id: prev.length ? Math.max(...prev.map((o) => o.id)) + 1 : 1 }];
+        return [
+          ...prev,
+          { ...order, id: prev.length ? Math.max(...prev.map((o) => o.id)) + 1 : 1 },
+        ];
       }
     });
     setDialogOpen(false);
@@ -94,8 +98,17 @@ export default function Orders() {
       width: 170,
       renderCell: (params) => (
         <>
-          <Button size="small" onClick={() => handleView(params.row)} style={{ marginRight: 8 }} variant="outlined">View</Button>
-          <Button size="small" onClick={() => handleEdit(params.row)} variant="outlined">Edit</Button>
+          <Button
+            size="small"
+            onClick={() => handleView(params.row)}
+            style={{ marginRight: 8 }}
+            variant="outlined"
+          >
+            View
+          </Button>
+          <Button size="small" onClick={() => handleEdit(params.row)} variant="outlined">
+            Edit
+          </Button>
         </>
       ),
       sortable: false,
@@ -108,15 +121,42 @@ export default function Orders() {
     <Stack spacing={2}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <h2 style={{ margin: 0 }}>Orders</h2>
-        <Button variant="contained" onClick={handleAdd}>New Order</Button>
+        <Button variant="contained" onClick={handleAdd}>
+          New Order
+        </Button>
       </Stack>
-      <div style={{ height: 600, width: '100%', background: '#fff', borderRadius: 8, position: 'relative' }}>
+      <div
+        style={{
+          height: 600,
+          width: '100%',
+          background: '#fff',
+          borderRadius: 8,
+          position: 'relative',
+        }}
+      >
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+            }}
+          >
             <span>Loading...</span>
           </div>
         ) : error ? (
-          <div style={{ color: 'red', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>{error}</div>
+          <div
+            style={{
+              color: 'red',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+            }}
+          >
+            {error}
+          </div>
         ) : (
           <DataGrid
             rows={orders}
@@ -137,12 +177,7 @@ export default function Orders() {
         order={editingOrder}
         onSave={handleSave}
       />
-      <OrderDetailsDialog
-        open={detailsOpen}
-        onClose={handleDetailsClose}
-        order={viewingOrder}
-      />
+      <OrderDetailsDialog open={detailsOpen} onClose={handleDetailsClose} order={viewingOrder} />
     </Stack>
   );
 }
-

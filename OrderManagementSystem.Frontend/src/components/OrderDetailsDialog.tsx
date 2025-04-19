@@ -19,13 +19,23 @@ export default function OrderDetailsDialog({ open, onClose, order }: OrderDetail
       <DialogContent>
         {order ? (
           <>
-            <Typography variant="body1"><strong>ID:</strong> {order.id ?? 'New'}</Typography>
-            <Typography variant="body1"><strong>Customer:</strong> {order.customer}</Typography>
-            <Typography variant="body1"><strong>Product:</strong> {order.product}</Typography>
-            <Typography variant="body1"><strong>Quantity:</strong> {order.quantity}</Typography>
+            <Typography variant="body1">
+              <strong>ID:</strong> {order.id ?? 'New'}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Customer:</strong> {order.customer}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Product:</strong> {order.product}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Quantity:</strong> {order.quantity}
+            </Typography>
           </>
         ) : (
-          <Typography variant="body2" color="textSecondary">No order selected.</Typography>
+          <Typography variant="body2" color="textSecondary">
+            No order selected.
+          </Typography>
         )}
       </DialogContent>
       <DialogActions>

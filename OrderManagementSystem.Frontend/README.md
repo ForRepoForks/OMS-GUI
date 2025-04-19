@@ -3,6 +3,7 @@
 This is the React + TypeScript front-end for the Order Management System (OMS). It provides a minimal, realistic UI for managing orders (and optionally customers/products) and is designed to work with the OMS API.
 
 ## Prerequisites
+
 - [Node.js (18+ recommended)](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
 
@@ -13,9 +14,11 @@ This is the React + TypeScript front-end for the Order Management System (OMS). 
    npm install
    ```
 2. **Start the development server:**
+
    ```sh
    npm run dev
    ```
+
    - The app will be available at [http://localhost:5173](http://localhost:5173)
 
 3. **Configure API URL:**
@@ -26,11 +29,13 @@ This is the React + TypeScript front-end for the Order Management System (OMS). 
      ```
 
 ## Project Structure
+
 - `src/` — React source code
 - `public/` — Static assets
 - `index.html` — Main HTML template
 
 ## Available Scripts
+
 - `npm run dev` — Start development server
 - `npm run build` — Build for production
 - `npm run preview` — Preview production build
@@ -39,16 +44,19 @@ This is the React + TypeScript front-end for the Order Management System (OMS). 
 
 For API documentation and backend setup, see the main project [README.md](../README.md).
 
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
+plugins: {
+// Add the react-x and react-dom plugins
+'react-x': reactX,
+'react-dom': reactDom,
+},
+rules: {
+// other rules...
+// Enable its recommended typescript rules
+...reactX.configs['recommended-typescript'].rules,
+...reactDom.configs.recommended.rules,
+},
 })
+
+```
+
 ```

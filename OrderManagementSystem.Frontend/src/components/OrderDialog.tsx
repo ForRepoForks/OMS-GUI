@@ -25,7 +25,11 @@ export default function OrderDialog({ open, onClose, order, onSave }: OrderDialo
   }, [order]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.name === 'quantity' ? e.target.value.replace(/[^\d]/g, '') : e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.name === 'quantity' ? e.target.value.replace(/[^\d]/g, '') : e.target.value,
+    });
     setTouched({ ...touched, [e.target.name]: true });
   };
 
@@ -76,7 +80,9 @@ export default function OrderDialog({ open, onClose, order, onSave }: OrderDialo
           fullWidth
           required
           error={touched.quantity && !isQuantityValid}
-          helperText={touched.quantity && !isQuantityValid ? 'Quantity must be a positive number' : ''}
+          helperText={
+            touched.quantity && !isQuantityValid ? 'Quantity must be a positive number' : ''
+          }
           inputProps={{ min: 1 }}
         />
       </DialogContent>

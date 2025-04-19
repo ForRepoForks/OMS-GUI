@@ -19,12 +19,13 @@ export default function Products() {
   React.useEffect(() => {
     setLoading(true);
     setError(null);
-    api.get('/api/products?page=1&pageSize=50')
-      .then(res => {
+    api
+      .get('/api/products?page=1&pageSize=50')
+      .then((res) => {
         const items = res.data.items || res.data;
         setProducts(items);
       })
-      .catch(_err => {
+      .catch((_err) => {
         setError('Failed to load products');
       })
       .finally(() => setLoading(false));
@@ -33,10 +34,16 @@ export default function Products() {
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'price', headerName: 'Price', type: 'number', width: 120, valueFormatter: (params: { value: any }) => {
-      const value = params?.value;
-      return value != null ? `$${value}` : '-';
-    } },
+    {
+      field: 'price',
+      headerName: 'Price',
+      type: 'number',
+      width: 120,
+      valueFormatter: (params: { value: any }) => {
+        const value = params?.value;
+        return value != null ? `$${value}` : '-';
+      },
+    },
     {
       field: 'discountPercentage',
       headerName: 'Discount %',
@@ -60,13 +67,38 @@ export default function Products() {
   return (
     <Stack spacing={2}>
       <h2 style={{ margin: 0 }}>Products</h2>
-      <div style={{ height: 600, width: '100%', background: '#fff', borderRadius: 8, position: 'relative' }}>
+      <div
+        style={{
+          height: 600,
+          width: '100%',
+          background: '#fff',
+          borderRadius: 8,
+          position: 'relative',
+        }}
+      >
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+            }}
+          >
             <span>Loading...</span>
           </div>
         ) : error ? (
-          <div style={{ color: 'red', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>{error}</div>
+          <div
+            style={{
+              color: 'red',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+            }}
+          >
+            {error}
+          </div>
         ) : (
           <DataGrid
             rows={products}
