@@ -8,9 +8,9 @@ This list focuses on building a minimal, realistic order management system front
 - [x] Add a basic README for the front-end and update the main project README with run instructions.
 
 ## 2. API Exploration & Integration
-- [ ] Review/document available API endpoints (from backend code or Swagger/OpenAPI if available).
-- [ ] Set up environment variable for API base URL.
-- [ ] Implement a simple API client (Axios or Fetch) with error handling.
+- [x] Review/document available API endpoints (from backend code or Swagger/OpenAPI if available).
+- [x] Set up environment variable for API base URL.
+- [x] Implement a simple API client (Axios or Fetch) with error handling.
 
 ## 3. UI/UX Design
 - [ ] Design a minimal real-app layout (sidebar/topbar, main content area).
