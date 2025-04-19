@@ -25,7 +25,7 @@ This list focuses on building a minimal, realistic order management system front
 
 ## 5. Developer Experience & Documentation
 - [x] Add ESLint and Prettier for code quality.
-- [ ] Add instructions in README for running the GUI and connecting it to the API.
+- [x] Add instructions in README for running the GUI and connecting it to the API.
 
 ---
 
