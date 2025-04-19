@@ -13,7 +13,7 @@ This list focuses on building a minimal, realistic order management system front
 - [x] Implement a simple API client (Axios or Fetch) with error handling.
 
 ## 3. UI/UX Design
-- [ ] Design a minimal real-app layout (sidebar/topbar, main content area).
+- [x] Design a minimal real-app layout (sidebar/topbar, main content area).
 - [ ] Add navigation for main sections: Orders, (optionally Customers/Products).
 - [ ] Use modern UI components (tables, forms, dialogs).
 
